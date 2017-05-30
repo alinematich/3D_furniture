@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<script src="js/three.js"></script>
+<script src="js/dat.gui.min.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="js/TGALoader.js"></script>
+<script src="js/threex.domevent.js"></script>
+<script>
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.gammaInput = true;
+    renderer.gammaOutput = true;
+
+    var scene = new THREE.Scene();
+
+    var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.set(-50, -10, 30);
+    scene.add(camera);
+
+    var matFloor = new THREE.MeshPhongMaterial({ dithering: true });
+    var geoFloor = new THREE.BoxGeometry(2000, 1, 2000);
+    var mshFloor = new THREE.Mesh(geoFloor, matFloor);
+    matFloor.color.set(0x808080);
+    mshFloor.receiveShadow = true;
+    scene.add(mshFloor);
+
+    var ambient = new THREE.AmbientLight(0xffffff, 0.1);
+    scene.add(ambient);
+
+    var spotLight = new THREE.SpotLight(0xffffff, 1);
+    spotLight.position.set(15, 60, -35);
+    spotLight.castShadow = true;
+    spotLight.angle = Math.PI / 4;
+    spotLight.penumbra = 0.05;
+    spotLight.decay = 2;
+    spotLight.distance = 200;
+    spotLight.shadow.mapSize.width = 1024;
+    spotLight.shadow.mapSize.height = 1024;
+    spotLight.shadow.camera.near = 1;
+    spotLight.shadow.camera.far = 200;
+    scene.add(spotLight);
+
+    var movobj;
+    var domEvents = new THREEx.DomEvents(camera, renderer.domElement);
+    var jsonloader = new THREE.JSONLoader();
+    var texloader = new THREE.TGALoader();
+
+    function loadmodel(num, scale, x, y, z, color, texes) {
+        jsonloader.load('model' + num + '/testmodel.js', function (geometry, materials) {
+            var object = new THREE.Mesh(geometry, materials);
+            object.scale.set(scale, scale, scale);
+            object.position.set(x, y, z);
+            object.castShadow = true;
+            object.texes = texes;
+            object.tex = 0;
+            object.changetex = function () {
+                object.tex = (object.tex + 1) % object.texes.length;
+                object.material[0].map = object.texes[object.tex];
+            };
+            object.material[0].map = texes[0];
+            object.material[0].color.set(color);
+            object.material[0].needsUpdate = true;
+            domEvents.addEventListener(object, 'click', function (event) {
+                controls.target.copy(event.target.position);
+                movobj = event.target;
+            });
+            scene.add(object);
+        });
+    }
+
+    loadmodel(1, 0.1, 0, 0, 0, 'orange', [texloader.load('model1/textures/T_chair2_N_4096.tga'), texloader.load('model1/textures/T_chair2_D_4096.tga')]);
+    loadmodel(2, 0.015, 30, 0, -30, 'red', [null]);
+    loadmodel(4, 0.1, 30, 0, 30, 'white', [null]);
+
+    document.addEventListener('keydown', onDocumentKeyDown, false);
+    function onDocumentKeyDown(event) {
+        var delta = 10;
+        event = event || window.event;
+        var keycode = event.keyCode;
+        switch (keycode) {
+            case 37 :
+                spotLight.position.x -= delta;
+                break;
+            case 38 :
+                spotLight.position.z -= delta;
+                break;
+            case 39 :
+                spotLight.position.x += delta;
+                break;
+            case 40 :
+                spotLight.position.z += delta;
+                break;
+            case 'Q'.charCodeAt(0):
+                movobj.rotation.y = movobj.rotation.y + 0.1;
+                break;
+            case 'E'.charCodeAt(0):
+                movobj.rotation.y = movobj.rotation.y - 0.1;
+                break;
+            case 'A'.charCodeAt(0):
+                movobj.position.x = movobj.position.x + 1;
+                break;
+            case 'S'.charCodeAt(0):
+                movobj.position.z = movobj.position.z + 1;
+                break;
+            case 'D'.charCodeAt(0):
+                movobj.position.x = movobj.position.x - 1;
+                break;
+            case 'W'.charCodeAt(0):
+                movobj.position.z = movobj.position.z - 1;
+                break;
+            case 'Z'.charCodeAt(0):
+                movobj.material[0].color.offsetHSL(0.1, 0, 0);
+                break;
+            case 'X'.charCodeAt(0):
+                movobj.changetex();
+                break;
+            case 219:
+                movobj.scale.set(movobj.scale.x + 0.005, movobj.scale.y + 0.005, movobj.scale.z + 0.005);
+                break;
+            case 221:
+                movobj.scale.set(movobj.scale.x - 0.005, movobj.scale.y - 0.005, movobj.scale.z - 0.005);
+                break;
+        }
+        console.log(keycode);
+        render();
+    }
+
+    function render() {
+        renderer.render(scene, camera);
+    }
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.addEventListener('change', render);
+    controls.minDistance = 20;
+    controls.maxDistance = 5000;
+    controls.maxPolarAngle = Math.PI / 2;
+    controls.enablePan = false;
+    controls.target.copy(new (function () {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+    })());
+    controls.update();
+    document.body.appendChild(renderer.domElement);
+    window.addEventListener('resize', function onResize() {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = ( window.innerWidth / window.innerHeight );
+        camera.updateProjectionMatrix();
+    }, false);
+    render();
+
+</script>
+</body>
+</html>
