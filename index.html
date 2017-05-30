@@ -27,11 +27,11 @@
     var scene = new THREE.Scene();
 
     var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set(-50, -10, 30);
+    camera.position.set(-50, -2, 30);
     scene.add(camera);
 
     var matFloor = new THREE.MeshPhongMaterial({ dithering: true });
-    var geoFloor = new THREE.BoxGeometry(2000, 1, 2000);
+    var geoFloor = new THREE.BoxGeometry(2000, -10, 2000);
     var mshFloor = new THREE.Mesh(geoFloor, matFloor);
     matFloor.color.set(0x808080);
     mshFloor.receiveShadow = true;
@@ -81,9 +81,9 @@
         });
     }
 
-    loadmodel(1, 0.1, 0, 0, 0, 'orange', [texloader.load('model1/textures/T_chair2_N_4096.tga'), texloader.load('model1/textures/T_chair2_D_4096.tga')]);
-    loadmodel(2, 0.015, 30, 0, -30, 'red', [null]);
-    loadmodel(4, 0.1, 30, 0, 30, 'white', [null]);
+    loadmodel(1, 0.1, 0, -2, 0, 'orange', [texloader.load('model1/textures/T_chair2_N_4096.tga'), texloader.load('model1/textures/T_chair2_D_4096.tga')]);
+    loadmodel(2, 0.015, 30, -2, -30, 'red', [null]);
+    loadmodel(4, 0.1, 30, -2, 30, 'white', [null]);
 
     document.addEventListener('keydown', onDocumentKeyDown, false);
     function onDocumentKeyDown(event) {
