@@ -33,7 +33,7 @@
     var matFloor = new THREE.MeshPhongMaterial({ dithering: true });
     var geoFloor = new THREE.BoxGeometry(2000, 1, 2000);
     var mshFloor = new THREE.Mesh(geoFloor, matFloor);
-    mshFloor.position.set(0,-20,0);
+    mshFloor.position.set(0,-4,0);
     matFloor.color.set(0x808080);
     mshFloor.receiveShadow = true;
     scene.add(mshFloor);
@@ -58,8 +58,8 @@
     var domEvents = new THREEx.DomEvents(camera, renderer.domElement);
     var jsonloader = new THREE.JSONLoader();
     var texloader = new THREE.TGALoader();
-    var texloaderpng = new THREE.TextureLoader();
-    
+    var texloaderpng=new THREE.TextureLoader();
+
     function loadmodel(num, scale, x, y, z, color, texes) {
         jsonloader.load('model' + num + '/testmodel.js', function (geometry, materials) {
             var object = new THREE.Mesh(geometry, materials);
@@ -76,16 +76,16 @@
             object.material[0].color.set(color);
             object.material[0].needsUpdate = true;
             domEvents.addEventListener(object, 'click', function (event) {
-                controls.target.copy(event.target.position);
+                //controls.target.copy(event.target.position);
                 movobj = event.target;
             });
             scene.add(object);
         });
     }
 
-    loadmodel(1, 0.1, 0, -20, 0, 'orange', [texloaderpng.load('model1/textures/T_chair2_N_4096.png'), texloader.load('model1/textures/T_chair2_D_4096.png')]);
-    loadmodel(2, 0.015, 30, -20, -30, 'red', [null]);
-    loadmodel(4, 0.1, 30, -20, 30, 'white', [null]);
+    loadmodel(1, 0.1, 0, -4, 0, 'orange', [texloaderpng.load('model1/textures/T_chair2_N_4096.png'), texloaderpng.load('model1/textures/T_chair2_D_4096.png')]);
+    loadmodel(2, 0.015, 30, -4, -30, 'red', [null]);
+    loadmodel(4, 0.1, 30, -4, 30, 'white', [null]);
 
     document.addEventListener('keydown', onDocumentKeyDown, false);
     function onDocumentKeyDown(event) {
@@ -136,7 +136,7 @@
                 movobj.scale.set(movobj.scale.x - 0.005, movobj.scale.y - 0.005, movobj.scale.z - 0.005);
                 break;
         }
-        //console.log(keycode);
+        console.log(keycode);
         render();
     }
 
