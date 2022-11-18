@@ -10,15 +10,15 @@ And then you can see the project in [localhost:8080](http://localhost:8080/)
 
 # Controls
 
-q, e: rotate the couch.
+Q, E: rotate the couch.
 
-a, w, s, d: move the couch.
+A, W, S, D: move the couch.
 
-[, ]: cahnge the couch size.
+\[, ]: change the couch size.
 
-z: change chair color.
+Z: change chair color.
 
-x: change chair texture.
+X: change chair texture.
 
 arrow keys: move the spot light.
 
